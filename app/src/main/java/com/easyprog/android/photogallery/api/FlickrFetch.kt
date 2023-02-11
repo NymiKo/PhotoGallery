@@ -36,6 +36,7 @@ class FlickrFetch {
                 var galleryItems: List<GalleryItem> = photoResponse?.galleryItems ?: mutableListOf()
                 galleryItems = galleryItems.filterNot { it.url.isBlank() }
                 responseLiveData.value = galleryItems
+                Log.e("SUCCESS", galleryItems.toString())
             }
 
             override fun onFailure(call: Call<FlickrResponse>, t: Throwable) {
