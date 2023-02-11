@@ -1,7 +1,9 @@
 package com.easyprog.android.photogallery.models
 
-data class GalleryIte(
+import com.google.gson.annotations.SerializedName
+
+data class GalleryItem(
     var title: String = "",
     var id: String = "",
-    var url: String = ""
+    @SerializedName("url_s") var url: String = ""
 )

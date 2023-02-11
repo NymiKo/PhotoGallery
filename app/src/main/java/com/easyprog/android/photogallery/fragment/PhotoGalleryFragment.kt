@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.easyprog.android.photogallery.R
 import com.easyprog.android.photogallery.api.FlickrFetch
+import com.easyprog.android.photogallery.models.GalleryItem
 
 class PhotoGalleryFragment : Fragment() {
 
@@ -23,10 +24,10 @@ class PhotoGalleryFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val flickrLiveData: LiveData<String> = FlickrFetch().fetchPhotos()
+        val flickrLiveData: LiveData<List<GalleryItem>> = FlickrFetch().fetchPhotos()
 
-        flickrLiveData.observe(this) { responseString ->
-            Log.e("SUCCESS", responseString)
+        flickrLiveData.observe(this) { galleryItems ->
+            Log.e("SUCCESS", galleryItems.toString())
         }
     }
 
