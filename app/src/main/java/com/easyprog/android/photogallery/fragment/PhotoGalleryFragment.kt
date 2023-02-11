@@ -1,20 +1,33 @@
 package com.easyprog.android.photogallery.fragment
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.easyprog.android.photogallery.R
+import com.easyprog.android.photogallery.api.FlickrFetch
 
-class PhotoGalleryFragment: Fragment() {
+class PhotoGalleryFragment : Fragment() {
 
     private lateinit var photoRecyclerView: RecyclerView
 
     companion object {
         fun newInstance() = PhotoGalleryFragment()
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        val flickrLiveData: LiveData<String> = FlickrFetch().fetchPhotos()
+
+        flickrLiveData.observe(this) { responseString ->
+            Log.e("SUCCESS", responseString)
+        }
     }
 
     override fun onCreateView(
