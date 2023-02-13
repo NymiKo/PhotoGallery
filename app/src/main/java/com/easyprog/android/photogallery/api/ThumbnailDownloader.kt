@@ -52,7 +52,6 @@ class ThumbnailDownloader<in T>(
     fun queueThumbnail(target: T, url: String, title: String) {
         requestMap[target] = DownloadedImage(title, url)
         requestHandler.obtainMessage(MESSAGE_DOWNLOAD, target).sendToTarget()
-        Log.e("REQUEST_MAP", requestMap[target].toString())
     }
 
     @Suppress("UNCHECKED_CAST")

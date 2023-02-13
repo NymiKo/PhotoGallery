@@ -50,8 +50,9 @@ class PhotoGalleryFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
-        viewLifecycleOwner.lifecycle.addObserver(thumbnailDownloader.viewLifecycleObserver)
+        viewLifecycleOwnerLiveData.observe(viewLifecycleOwner) { lifecycleOwner ->
+            lifecycleOwner?.lifecycle?.addObserver(thumbnailDownloader.viewLifecycleObserver)
+        }
 
         val view = inflater.inflate(R.layout.fragment_photo_gallery, container, false)
 
