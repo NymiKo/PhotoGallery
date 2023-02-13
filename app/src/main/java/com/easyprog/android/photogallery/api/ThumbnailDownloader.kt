@@ -6,6 +6,7 @@ import android.os.Handler
 import android.os.HandlerThread
 import android.os.Looper
 import android.os.Message
+import android.util.Log
 import androidx.lifecycle.*
 import com.easyprog.android.photogallery.models.DownloadedImage
 import java.util.concurrent.ConcurrentHashMap
@@ -49,9 +50,9 @@ class ThumbnailDownloader<in T>(
     }
 
     fun queueThumbnail(target: T, url: String, title: String) {
-        requestMap[target]?.title = title
-        requestMap[target]?.url = url
+        requestMap[target] = DownloadedImage(title, url)
         requestHandler.obtainMessage(MESSAGE_DOWNLOAD, target).sendToTarget()
+        Log.e("REQUEST_MAP", requestMap[target].toString())
     }
 
     @Suppress("UNCHECKED_CAST")
