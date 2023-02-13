@@ -42,7 +42,7 @@ class PhotoGalleryFragment : Fragment() {
             val drawable = BitmapDrawable(resources, bitmap)
             photoHolder.bindImage(drawable, title)
         }
-        lifecycle.addObserver(thumbnailDownloader)
+        lifecycle.addObserver(thumbnailDownloader.fragmentLifecycleObserver)
     }
 
     override fun onCreateView(
@@ -50,6 +50,9 @@ class PhotoGalleryFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+
+        viewLifecycleOwner.lifecycle.addObserver(thumbnailDownloader.viewLifecycleObserver)
+
         val view = inflater.inflate(R.layout.fragment_photo_gallery, container, false)
 
         photoRecyclerView = view.findViewById(R.id.photo_recycler_view)
@@ -63,11 +66,6 @@ class PhotoGalleryFragment : Fragment() {
         viewModel.galleryItemLiveData.observe(viewLifecycleOwner) { galleryItems ->
             photoRecyclerView.adapter = PhotoGalleryAdapter(galleryItems)
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        lifecycle.removeObserver(thumbnailDownloader)
     }
 
     inner class PhotoGalleryAdapter(private val galleryItems: List<GalleryItem>) :
@@ -97,5 +95,15 @@ class PhotoGalleryFragment : Fragment() {
                 textTitleImage.text = title
             }
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        viewLifecycleOwner.lifecycle.removeObserver(thumbnailDownloader.viewLifecycleObserver)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        lifecycle.removeObserver(thumbnailDownloader.fragmentLifecycleObserver)
     }
 }

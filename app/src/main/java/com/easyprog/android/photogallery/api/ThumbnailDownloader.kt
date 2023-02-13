@@ -17,6 +17,27 @@ class ThumbnailDownloader<in T>(
     private val onThumbnailDownloaded: (T, Bitmap, String) -> Unit
     ) : HandlerThread("ThumbnailDownloader"), DefaultLifecycleObserver {
 
+    val fragmentLifecycleObserver: DefaultLifecycleObserver = object : DefaultLifecycleObserver {
+        override fun onCreate(owner: LifecycleOwner) {
+            super.onCreate(owner)
+            start()
+            looper
+        }
+
+        override fun onDestroy(owner: LifecycleOwner) {
+            super.onDestroy(owner)
+            quit()
+        }
+    }
+
+    val viewLifecycleObserver: DefaultLifecycleObserver = object : DefaultLifecycleObserver {
+        override fun onDestroy(owner: LifecycleOwner) {
+            super.onDestroy(owner)
+            requestHandler.removeMessages(MESSAGE_DOWNLOAD)
+            requestMap.clear()
+        }
+    }
+
     private var hasQuit = false
     private lateinit var requestHandler: Handler
     private val requestMap = ConcurrentHashMap<T, DownloadedImage>()
@@ -59,16 +80,5 @@ class ThumbnailDownloader<in T>(
             requestMap.remove(target)
             onThumbnailDownloaded(target, bitmap, title)
         })
-    }
-
-    override fun onCreate(owner: LifecycleOwner) {
-        super.onCreate(owner)
-        start()
-        looper
-    }
-
-    override fun onDestroy(owner: LifecycleOwner) {
-        super.onDestroy(owner)
-        quit()
     }
 }
