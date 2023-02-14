@@ -7,6 +7,8 @@ import android.os.HandlerThread
 import android.os.Looper
 import android.os.Message
 import android.util.Log
+import android.util.LruCache
+import android.widget.Button
 import androidx.lifecycle.*
 import com.easyprog.android.photogallery.models.DownloadedImage
 import java.util.concurrent.ConcurrentHashMap
@@ -17,6 +19,18 @@ class ThumbnailDownloader<in T>(
     private val responseHandler: Handler,
     private val onThumbnailDownloaded: (T, Bitmap, String) -> Unit
 ) : HandlerThread("ThumbnailDownloader"), DefaultLifecycleObserver {
+
+    private val lruCache: LruCache<String, Bitmap>
+
+    init {
+        val maxMemory = (Runtime.getRuntime().maxMemory() / 1024).toInt()
+        val cacheSize = maxMemory / 4
+        lruCache = object : LruCache<String, Bitmap>(cacheSize) {
+            override fun sizeOf(key: String?, bitmap: Bitmap): Int {
+                return bitmap.byteCount / 1024
+            }
+        }
+    }
 
     var fragmentLifecycle: Lifecycle? = null
         set(value) {
@@ -51,6 +65,7 @@ class ThumbnailDownloader<in T>(
 
     override fun quit(): Boolean {
         hasQuit = true
+        lruCache.evictAll()
         return super.quit()
     }
 
@@ -75,7 +90,14 @@ class ThumbnailDownloader<in T>(
     private fun handleRequest(target: T) {
         val url = requestMap[target]?.url ?: return
         val title = requestMap[target]?.title ?: return
-        val bitmap = flickerFetch.fetchPhoto(url) ?: return
+        val bitmap: Bitmap
+
+        if (lruCache.get(title) != null) {
+            bitmap = lruCache.get(title)
+        } else {
+            bitmap = flickerFetch.fetchPhoto(url)!!
+            lruCache.put(title, bitmap)
+        }
 
         responseHandler.post(Runnable {
             if (requestMap[target]?.url != url || hasQuit) {
