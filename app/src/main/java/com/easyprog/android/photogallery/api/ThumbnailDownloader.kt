@@ -16,26 +16,31 @@ private const val MESSAGE_DOWNLOAD = 0
 class ThumbnailDownloader<in T>(
     private val responseHandler: Handler,
     private val onThumbnailDownloaded: (T, Bitmap, String) -> Unit
-    ) : HandlerThread("ThumbnailDownloader"), DefaultLifecycleObserver {
+) : HandlerThread("ThumbnailDownloader"), DefaultLifecycleObserver {
 
-    val fragmentLifecycleObserver: DefaultLifecycleObserver = object : DefaultLifecycleObserver {
+    var fragmentLifecycle: Lifecycle? = null
+        set(value) {
+            field = value
+            field?.addObserver(this.fragmentLifecycleObserver)
+        }
+
+    private val fragmentLifecycleObserver: DefaultLifecycleObserver = object : DefaultLifecycleObserver {
         override fun onCreate(owner: LifecycleOwner) {
             super.onCreate(owner)
             start()
             looper
         }
 
-        override fun onDestroy(owner: LifecycleOwner) {
-            super.onDestroy(owner)
-            quit()
-        }
-    }
-
-    val viewLifecycleObserver: DefaultLifecycleObserver = object : DefaultLifecycleObserver {
-        override fun onDestroy(owner: LifecycleOwner) {
-            super.onDestroy(owner)
+        override fun onStop(owner: LifecycleOwner) {
+            super.onStop(owner)
             requestHandler.removeMessages(MESSAGE_DOWNLOAD)
             requestMap.clear()
+        }
+
+        override fun onDestroy(owner: LifecycleOwner) {
+            super.onDestroy(owner)
+            fragmentLifecycle?.removeObserver(this)
+            quit()
         }
     }
 
