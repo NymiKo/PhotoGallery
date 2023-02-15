@@ -7,6 +7,6 @@ import com.easyprog.android.photogallery.models.GalleryItem
 
 class PhotoGalleryViewModel: ViewModel() {
 
-    val galleryItemLiveData: LiveData<List<GalleryItem>> = FlickrFetch().fetchPhotos()
+    val galleryItemLiveData: LiveData<List<GalleryItem>> = FlickrFetch().searchPhotos("May")
 
 }
