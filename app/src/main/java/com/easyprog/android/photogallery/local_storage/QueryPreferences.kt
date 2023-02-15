@@ -1,6 +1,7 @@
 package com.easyprog.android.photogallery.local_storage
 
 import android.content.Context
+import androidx.core.content.edit
 import androidx.preference.PreferenceManager
 
 private const val PREF_SEARCH_QUERY = "searchQuery"
@@ -13,10 +14,9 @@ object QueryPreferences {
     }
 
     fun setStorageQuery(context: Context, query: String) {
-        PreferenceManager.getDefaultSharedPreferences(context)
-            .edit()
-            .putString(PREF_SEARCH_QUERY, query)
-            .apply()
+        PreferenceManager.getDefaultSharedPreferences(context).edit {
+            putString(PREF_SEARCH_QUERY, query)
+        }
     }
 
 }

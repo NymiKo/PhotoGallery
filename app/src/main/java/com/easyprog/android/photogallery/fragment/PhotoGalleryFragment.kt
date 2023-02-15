@@ -9,6 +9,7 @@ import android.os.Looper
 import android.util.Log
 import android.view.*
 import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.SearchView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
@@ -27,6 +28,7 @@ import com.easyprog.android.photogallery.viewmodel.PhotoGalleryViewModel
 class PhotoGalleryFragment : Fragment() {
 
     private lateinit var photoRecyclerView: RecyclerView
+    private lateinit var progressBar: ProgressBar
 
     private val viewModel: PhotoGalleryViewModel by lazy { ViewModelProvider(this)[PhotoGalleryViewModel::class.java] }
 
@@ -56,7 +58,8 @@ class PhotoGalleryFragment : Fragment() {
 
         val view = inflater.inflate(R.layout.fragment_photo_gallery, container, false)
 
-        photoRecyclerView = view.findViewById(R.id.photo_recycler_view)
+        photoRecyclerView = view.findViewById(R.id.photo_recycler_view) as RecyclerView
+        progressBar = view.findViewById(R.id.progress) as ProgressBar
         photoRecyclerView.layoutManager = GridLayoutManager(context, 3)
 
         return view
@@ -66,6 +69,8 @@ class PhotoGalleryFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupMenu()
         viewModel.galleryItemLiveData.observe(viewLifecycleOwner) { galleryItems ->
+            progressBar.visibility = View.GONE
+            photoRecyclerView.visibility = View.VISIBLE
             photoRecyclerView.adapter = PhotoGalleryAdapter(galleryItems)
         }
     }
@@ -81,19 +86,24 @@ class PhotoGalleryFragment : Fragment() {
                 searchView.apply {
                     setOnQueryTextListener(object : SearchView.OnQueryTextListener {
                         override fun onQueryTextSubmit(query: String): Boolean {
-                            Log.e("SEARCH_VIEW", "QueryText: $query")
+                            progressBar.visibility = View.VISIBLE
+                            photoRecyclerView.visibility = View.GONE
                             viewModel.fetchPhotos(query)
+                            clearFocus()
                             return true
                         }
 
                         override fun onQueryTextChange(newText: String?): Boolean {
-                            Log.e("SEARCH_VIEW", "QueryTextChange: $newText")
                             return false
                         }
                     })
 
                     setOnSearchClickListener {
                         searchView.setQuery(viewModel.searchTerm, false)
+                    }
+
+                    setOnFocusChangeListener { _, hasFocus ->
+                        if (!hasFocus) searchItem.collapseActionView()
                     }
                 }
             }
