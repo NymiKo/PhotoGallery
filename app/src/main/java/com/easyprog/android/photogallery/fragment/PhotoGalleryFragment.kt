@@ -13,6 +13,7 @@ import android.widget.ProgressBar
 import android.widget.SearchView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.core.util.Pools.Pool
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
@@ -20,15 +21,14 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.work.Constraints
-import androidx.work.NetworkType
-import androidx.work.OneTimeWorkRequest
-import androidx.work.WorkManager
+import androidx.work.*
 import com.easyprog.android.photogallery.R
 import com.easyprog.android.photogallery.api.ThumbnailDownloader
+import com.easyprog.android.photogallery.local_storage.QueryPreferences
 import com.easyprog.android.photogallery.models.GalleryItem
 import com.easyprog.android.photogallery.viewmodel.PhotoGalleryViewModel
 import com.easyprog.android.photogallery.work_manager.PollWorker
+import java.util.concurrent.TimeUnit
 
 class PhotoGalleryFragment : Fragment() {
 
@@ -40,6 +40,8 @@ class PhotoGalleryFragment : Fragment() {
     private lateinit var thumbnailDownloader: ThumbnailDownloader<PhotoGalleryAdapter.PhotoGalleryViewHolder>
 
     companion object {
+        private const val POLL_WORK = "POLL_WORK"
+
         fun newInstance() = PhotoGalleryFragment()
     }
 
@@ -53,14 +55,6 @@ class PhotoGalleryFragment : Fragment() {
             photoHolder.bindImage(drawable, title)
         }
         thumbnailDownloader.fragmentLifecycle = lifecycle
-
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.UNMETERED)
-            .build()
-        val workRequest = OneTimeWorkRequest.Builder(PollWorker::class.java)
-            .setConstraints(constraints)
-            .build()
-        WorkManager.getInstance(requireActivity()).enqueue(workRequest)
     }
 
     override fun onCreateView(
@@ -119,6 +113,11 @@ class PhotoGalleryFragment : Fragment() {
                         if (!hasFocus) searchItem.collapseActionView()
                     }
                 }
+
+                val toggleItem = menu.findItem(R.id.menu_item_toggle_polling)
+                val isPolling = QueryPreferences.isPolling(requireContext())
+                val toggleItemTitle = if (isPolling) R.string.stop_polling else R.string.start_polling
+                toggleItem.setTitle(toggleItemTitle)
             }
 
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
@@ -126,6 +125,28 @@ class PhotoGalleryFragment : Fragment() {
                     R.id.menu_item_clear -> {
                         viewModel.fetchPhotos("")
                         true
+                    }
+                    R.id.menu_item_toggle_polling -> {
+                        val isPolling = QueryPreferences.isPolling(requireContext())
+                        if (isPolling) {
+                            WorkManager.getInstance(requireContext()).cancelUniqueWork(POLL_WORK)
+                            QueryPreferences.setPolling(requireContext(), false)
+                        } else {
+                            val constraints = Constraints.Builder()
+                                .setRequiredNetworkType(NetworkType.UNMETERED)
+                                .build()
+
+                            val periodicRequest = PeriodicWorkRequest.Builder(PollWorker::class.java, 15, TimeUnit.MINUTES)
+                                .setConstraints(constraints)
+                                .build()
+
+                            WorkManager.getInstance(requireContext()).enqueueUniquePeriodicWork(
+                                POLL_WORK, ExistingPeriodicWorkPolicy.KEEP, periodicRequest)
+
+                            QueryPreferences.setPolling(requireContext(), true)
+                        }
+                        activity?.invalidateMenu()
+                        return true
                     }
                     else -> true
                 }
