@@ -58,12 +58,20 @@ class FlickrFetch {
         return responseLiveData
     }
 
+    fun fetchPhotosRequest(): Call<PhotoDeserializer> {
+        return flickrApi.fetchPhotos()
+    }
+
     fun fetchPhotos(): LiveData<List<GalleryItem>> {
-        return fetchPhotoMetaData(flickrApi.fetchPhotos())
+        return fetchPhotoMetaData(fetchPhotosRequest())
+    }
+
+    fun searchPhotoRequest(query: String): Call<PhotoDeserializer> {
+        return flickrApi.searchPhotos(query)
     }
 
     fun searchPhotos(query: String): LiveData<List<GalleryItem>> {
-        return fetchPhotoMetaData(flickrApi.searchPhotos(query))
+        return fetchPhotoMetaData(searchPhotoRequest(query))
     }
 
     @WorkerThread

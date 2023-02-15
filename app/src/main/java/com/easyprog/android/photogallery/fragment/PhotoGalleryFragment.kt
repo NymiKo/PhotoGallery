@@ -20,10 +20,15 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.work.Constraints
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequest
+import androidx.work.WorkManager
 import com.easyprog.android.photogallery.R
 import com.easyprog.android.photogallery.api.ThumbnailDownloader
 import com.easyprog.android.photogallery.models.GalleryItem
 import com.easyprog.android.photogallery.viewmodel.PhotoGalleryViewModel
+import com.easyprog.android.photogallery.work_manager.PollWorker
 
 class PhotoGalleryFragment : Fragment() {
 
@@ -48,6 +53,14 @@ class PhotoGalleryFragment : Fragment() {
             photoHolder.bindImage(drawable, title)
         }
         thumbnailDownloader.fragmentLifecycle = lifecycle
+
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.UNMETERED)
+            .build()
+        val workRequest = OneTimeWorkRequest.Builder(PollWorker::class.java)
+            .setConstraints(constraints)
+            .build()
+        WorkManager.getInstance(requireActivity()).enqueue(workRequest)
     }
 
     override fun onCreateView(
