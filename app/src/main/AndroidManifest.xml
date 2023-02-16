@@ -33,7 +33,8 @@
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
-        <activity android:name=".activities.PhotoPageActivity"/>
+        <activity android:name=".activities.PhotoPageActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"/>
 
         <receiver android:name=".receiver.NotificationReceiver"
             android:permission="com.easyprog.android.photogallery.PRIVATE"

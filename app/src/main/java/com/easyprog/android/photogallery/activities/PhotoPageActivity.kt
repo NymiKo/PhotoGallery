@@ -6,11 +6,15 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.PersistableBundle
 import android.util.Log
+import android.webkit.WebView
+import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import com.easyprog.android.photogallery.R
 import com.easyprog.android.photogallery.fragments.PhotoPageFragment
 
 class PhotoPageActivity: AppCompatActivity() {
+
+    private lateinit var webView: WebView
 
     companion object {
         fun newIntent(context: Context, photoPageUri: Uri): Intent {
@@ -23,6 +27,7 @@ class PhotoPageActivity: AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_photo_page)
+
         val fm = supportFragmentManager
         val currentFragment = fm.findFragmentById(R.id.fragment_container)
 
@@ -31,5 +36,4 @@ class PhotoPageActivity: AppCompatActivity() {
             fm.beginTransaction().add(R.id.fragment_container, fragment).commit()
         }
     }
-
 }

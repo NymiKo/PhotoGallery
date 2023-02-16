@@ -11,6 +11,7 @@ import android.webkit.WebChromeClient
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.ProgressBar
+import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import com.easyprog.android.photogallery.R
 
@@ -35,6 +36,7 @@ class PhotoPageFragment : VisibleFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         uri = requireArguments().getParcelable(ARG_URI) ?: Uri.EMPTY
+        onBackPressedCallback()
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -71,4 +73,13 @@ class PhotoPageFragment : VisibleFragment() {
         return view
     }
 
+    private fun onBackPressedCallback() {
+        requireActivity().onBackPressedDispatcher.addCallback {
+            if (webView.canGoBack()) {
+                webView.goBack()
+            } else {
+                requireActivity().finish()
+            }
+        }
+    }
 }
