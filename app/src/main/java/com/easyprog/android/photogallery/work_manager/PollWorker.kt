@@ -17,6 +17,12 @@ import com.easyprog.android.photogallery.models.GalleryItem
 
 class PollWorker(val context: Context, workerParams: WorkerParameters) :
     Worker(context, workerParams) {
+
+    companion object {
+        const val ACTION_SHOW_NOTIFICATION = "com.easyprog.android.photogallery.SHOW_NOTIFICATION"
+        const val PREM_PRIVATE = "com.easyprog.android.photogallery.PRIVATE"
+    }
+
     override fun doWork(): Result {
 
         val query = QueryPreferences.getStorageQuery(context)
@@ -50,6 +56,8 @@ class PollWorker(val context: Context, workerParams: WorkerParameters) :
 
             val notificationManager = NotificationManagerCompat.from(context)
             notificationManager.notify(0, notification)
+
+            context.sendBroadcast(Intent(ACTION_SHOW_NOTIFICATION), PREM_PRIVATE)
         }
 
         return Result.success()

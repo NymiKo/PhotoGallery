@@ -6,14 +6,12 @@ import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.view.*
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.SearchView
 import android.widget.TextView
 import androidx.core.content.ContextCompat
-import androidx.core.util.Pools.Pool
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
@@ -116,12 +114,13 @@ class PhotoGalleryFragment : Fragment() {
 
                 val toggleItem = menu.findItem(R.id.menu_item_toggle_polling)
                 val isPolling = QueryPreferences.isPolling(requireContext())
-                val toggleItemTitle = if (isPolling) R.string.stop_polling else R.string.start_polling
+                val toggleItemTitle =
+                    if (isPolling) R.string.stop_polling else R.string.start_polling
                 toggleItem.setTitle(toggleItemTitle)
             }
 
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-                return when(menuItem.itemId) {
+                return when (menuItem.itemId) {
                     R.id.menu_item_clear -> {
                         viewModel.fetchPhotos("")
                         true
@@ -136,12 +135,17 @@ class PhotoGalleryFragment : Fragment() {
                                 .setRequiredNetworkType(NetworkType.UNMETERED)
                                 .build()
 
-                            val periodicRequest = PeriodicWorkRequest.Builder(PollWorker::class.java, 15, TimeUnit.MINUTES)
+                            val periodicRequest = PeriodicWorkRequest.Builder(
+                                PollWorker::class.java,
+                                15,
+                                TimeUnit.MINUTES
+                            )
                                 .setConstraints(constraints)
                                 .build()
 
                             WorkManager.getInstance(requireContext()).enqueueUniquePeriodicWork(
-                                POLL_WORK, ExistingPeriodicWorkPolicy.KEEP, periodicRequest)
+                                POLL_WORK, ExistingPeriodicWorkPolicy.KEEP, periodicRequest
+                            )
 
                             QueryPreferences.setPolling(requireContext(), true)
                         }
@@ -165,7 +169,8 @@ class PhotoGalleryFragment : Fragment() {
 
         override fun onBindViewHolder(holder: PhotoGalleryViewHolder, position: Int) {
             val galleryItem = galleryItems[position]
-            val drawable = ContextCompat.getDrawable(requireContext(), R.drawable.bill_up_close) ?: ColorDrawable()
+            val drawable = ContextCompat.getDrawable(requireContext(), R.drawable.bill_up_close)
+                ?: ColorDrawable()
             holder.bindImage(drawable, galleryItem.title)
             thumbnailDownloader.queueThumbnail(holder, galleryItem.url, galleryItem.title)
         }
