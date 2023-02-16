@@ -2,9 +2,15 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <permission android:name="com.easyprog.android.photogallery.PRIVATE"
+        android:protectionLevel="signature"/>
+
+    <uses-permission android:name="com.easyprog.android.photogallery.PRIVATE"/>
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
     <application
+        android:name=".app.PhotoGalleryApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -15,7 +21,7 @@
         android:theme="@style/Theme.PhotoGallery"
         tools:targetApi="31">
         <activity
-            android:name=".activity.PhotoGalleryActivity"
+            android:name=".activities.PhotoGalleryActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -27,6 +33,17 @@
                 android:name="android.app.lib_name"
                 android:value="" />
         </activity>
+        <activity android:name=".activities.PhotoPageActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"/>
+
+        <receiver android:name=".receiver.NotificationReceiver"
+            android:permission="com.easyprog.android.photogallery.PRIVATE"
+            android:exported="false">
+            <intent-filter android:priority="-999">
+                <action
+                    android:name="com.easyprog.android.photogallery.SHOW_NOTIFICATION"/>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

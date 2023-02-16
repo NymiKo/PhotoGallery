@@ -9,29 +9,33 @@ import androidx.lifecycle.MutableLiveData
 import com.easyprog.android.photogallery.models.GalleryItem
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import okhttp3.OkHttpClient
 import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.http.Query
 
 class FlickrFetch {
 
     private val flickrApi: FlickrApi
 
     init {
+        val client = OkHttpClient.Builder().addInterceptor(PhotoInterceptor()).build()
         val gson: Gson = GsonBuilder().registerTypeAdapter(PhotoResponse::class.java, PhotoDeserializer()).create()
         val retrofit: Retrofit =
             Retrofit.Builder().baseUrl("https://api.flickr.com/").addConverterFactory(
                 GsonConverterFactory.create(gson)
-            ).build()
+            )
+                .client(client)
+                .build()
         flickrApi = retrofit.create(FlickrApi::class.java)
     }
 
-    fun fetchPhotos(): LiveData<List<GalleryItem>> {
+    private fun fetchPhotoMetaData(flickrRequest: Call<PhotoDeserializer>): LiveData<List<GalleryItem>> {
         val responseLiveData: MutableLiveData<List<GalleryItem>> = MutableLiveData()
-        val flickrRequest: Call<PhotoDeserializer> = flickrApi.fetchPhotos()
 
         flickrRequest.enqueue(object : Callback<PhotoDeserializer> {
             override fun onResponse(
@@ -52,6 +56,22 @@ class FlickrFetch {
         })
 
         return responseLiveData
+    }
+
+    fun fetchPhotosRequest(): Call<PhotoDeserializer> {
+        return flickrApi.fetchPhotos()
+    }
+
+    fun fetchPhotos(): LiveData<List<GalleryItem>> {
+        return fetchPhotoMetaData(fetchPhotosRequest())
+    }
+
+    fun searchPhotoRequest(query: String): Call<PhotoDeserializer> {
+        return flickrApi.searchPhotos(query)
+    }
+
+    fun searchPhotos(query: String): LiveData<List<GalleryItem>> {
+        return fetchPhotoMetaData(searchPhotoRequest(query))
     }
 
     @WorkerThread
