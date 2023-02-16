@@ -28,7 +28,7 @@ import com.easyprog.android.photogallery.viewmodel.PhotoGalleryViewModel
 import com.easyprog.android.photogallery.work_manager.PollWorker
 import java.util.concurrent.TimeUnit
 
-class PhotoGalleryFragment : Fragment() {
+class PhotoGalleryFragment : VisibleFragment() {
 
     private lateinit var photoRecyclerView: RecyclerView
     private lateinit var progressBar: ProgressBar
