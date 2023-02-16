@@ -1,11 +1,11 @@
-package com.easyprog.android.photogallery.activity
+package com.easyprog.android.photogallery.activities
 
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.easyprog.android.photogallery.R
-import com.easyprog.android.photogallery.fragment.PhotoGalleryFragment
+import com.easyprog.android.photogallery.fragments.PhotoGalleryFragment
 
 class PhotoGalleryActivity : AppCompatActivity() {
 

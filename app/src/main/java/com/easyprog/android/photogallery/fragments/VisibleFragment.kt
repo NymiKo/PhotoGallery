@@ -1,4 +1,4 @@
-package com.easyprog.android.photogallery.fragment
+package com.easyprog.android.photogallery.fragments
 
 import android.app.Activity
 import android.content.BroadcastReceiver
@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.util.Log
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.easyprog.android.photogallery.work_manager.PollWorker
 

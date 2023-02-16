@@ -1,4 +1,4 @@
-package com.easyprog.android.photogallery.fragment
+package com.easyprog.android.photogallery.fragments
 
 import android.content.Intent
 import android.graphics.drawable.BitmapDrawable
@@ -15,13 +15,13 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.work.*
 import com.easyprog.android.photogallery.R
+import com.easyprog.android.photogallery.activities.PhotoPageActivity
 import com.easyprog.android.photogallery.api.ThumbnailDownloader
 import com.easyprog.android.photogallery.local_storage.QueryPreferences
 import com.easyprog.android.photogallery.models.GalleryItem
@@ -199,7 +199,7 @@ class PhotoGalleryFragment : VisibleFragment() {
             }
 
             override fun onClick(v: View?) {
-                val intent = Intent(Intent.ACTION_VIEW, galleryItem.photoPageUri)
+                val intent = PhotoPageActivity.newIntent(requireContext(), galleryItem.photoPageUri)
                 startActivity(intent)
             }
         }

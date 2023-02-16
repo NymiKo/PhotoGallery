@@ -6,11 +6,10 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.easyprog.android.photogallery.R
-import com.easyprog.android.photogallery.activity.PhotoGalleryActivity
+import com.easyprog.android.photogallery.activities.PhotoGalleryActivity
 import com.easyprog.android.photogallery.api.FlickrFetch
 import com.easyprog.android.photogallery.app.NOTIFICATION_CHANNEL_ID
 import com.easyprog.android.photogallery.local_storage.QueryPreferences
