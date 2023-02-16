@@ -37,7 +37,7 @@
         <receiver android:name=".receiver.NotificationReceiver"
             android:permission="com.easyprog.android.photogallery.PRIVATE"
             android:exported="false">
-            <intent-filter>
+            <intent-filter android:priority="-999">
                 <action
                     android:name="com.easyprog.android.photogallery.SHOW_NOTIFICATION"/>
             </intent-filter>

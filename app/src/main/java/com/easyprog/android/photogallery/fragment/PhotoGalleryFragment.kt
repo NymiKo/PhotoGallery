@@ -1,5 +1,6 @@
 package com.easyprog.android.photogallery.fragment
 
+import android.content.Intent
 import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
@@ -169,6 +170,7 @@ class PhotoGalleryFragment : VisibleFragment() {
 
         override fun onBindViewHolder(holder: PhotoGalleryViewHolder, position: Int) {
             val galleryItem = galleryItems[position]
+            holder.bindGalleryItems(galleryItem)
             val drawable = ContextCompat.getDrawable(requireContext(), R.drawable.bill_up_close)
                 ?: ColorDrawable()
             holder.bindImage(drawable, galleryItem.title)
@@ -177,13 +179,28 @@ class PhotoGalleryFragment : VisibleFragment() {
 
         override fun getItemCount(): Int = galleryItems.size
 
-        inner class PhotoGalleryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        inner class PhotoGalleryViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
             private val imageView: ImageView = itemView.findViewById(R.id.image_view)
             private val textTitleImage: TextView = itemView.findViewById(R.id.title_image)
+
+            private lateinit var galleryItem: GalleryItem
+
+            init {
+                itemView.setOnClickListener(this)
+            }
 
             val bindImage: (Drawable, CharSequence) -> Unit = { image, title ->
                 imageView.setImageDrawable(image)
                 textTitleImage.text = title
+            }
+
+            fun bindGalleryItems(item: GalleryItem) {
+                galleryItem = item
+            }
+
+            override fun onClick(v: View?) {
+                val intent = Intent(Intent.ACTION_VIEW, galleryItem.photoPageUri)
+                startActivity(intent)
             }
         }
     }
